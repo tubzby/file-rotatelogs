@@ -319,6 +319,10 @@ func (rl *RotateLogs) rotateNolock(filename string) error {
 	// the linter tells me to pre allocate this...
 	toUnlink := make([]string, 0, len(matches))
 	for _, path := range matches {
+		// Ignore current logfile
+		if filename == path {
+			continue
+		}
 		// Ignore lock files
 		if strings.HasSuffix(path, "_lock") || strings.HasSuffix(path, "_symlink") {
 			continue
