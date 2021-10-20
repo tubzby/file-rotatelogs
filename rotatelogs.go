@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -318,6 +319,13 @@ func (rl *RotateLogs) rotateNolock(filename string) error {
 
 	// the linter tells me to pre allocate this...
 	toUnlink := make([]string, 0, len(matches))
+
+	// sort by incline mode of modify time
+	sort.Slice(matches, func(i, j int) bool {
+		fi, _ := os.Stat(matches[i])
+		fj, _ := os.Stat(matches[j])
+		return fi.ModTime().Before(fj.ModTime())
+	})
 	for _, path := range matches {
 		// Ignore current logfile
 		if filename == path {
